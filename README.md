@@ -10,14 +10,24 @@ pip install NetworkXsimple
 
 ### api
 ```python
-graph.addNode(name="node name", desc="node A desc", pos=(int layer, int node No. in this layer) , nexts=[
+graph.addNode(
+    name="node name",
+    pos=(int layer, int node No)  ,
+    nexts=[
     {
-        "node": "B",
-        "label":"B"
-    },
-    previous=[]
-])
+        "node": "G",
+        "label":"edge label"
+    }],
+    previous=[
+        {
+            "node": "G",
+            "label": "edge label G"
+        }
+    ],
+    label="AAAAA",
+    label_color="pink")
 ```
+![img.png](img.png)
 * nexts : output degress   dict
 * previous : input degress  dict
 ``
