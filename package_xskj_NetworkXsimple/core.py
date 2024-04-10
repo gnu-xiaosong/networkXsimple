@@ -1,5 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
+
+plt.rcParams['font.family'] = 'SimHei'  # 替换为你选择的字体
 
 
 class netGraph:
@@ -16,7 +19,7 @@ class netGraph:
         self.AlgorithmType = "line"  # 调整算法类型
         self.node_size = 700
 
-    def addNode(self, name="", desc="", pos=(1, 1), previous=[], nexts=[]):
+    def addNode(self, name="", pos=(1, 1), previous=[], nexts=[] ,label="", label_color ="black" , **kwargs):
         """
         desc：增加节点
         paremeters:
@@ -25,6 +28,8 @@ class netGraph:
                "node": ,
                "label":
             }]
+            label="", label_color ="black"
+
         """
         degrees = []
         for item in previous:
@@ -32,6 +37,7 @@ class netGraph:
                 "type": 0,  # 入度
                 "node": item["node"],
                 "label": item["label"],
+                "color": "green",
                 "weight": 1
             })
 
@@ -40,13 +46,15 @@ class netGraph:
                 "type": 1,  # 出度
                 "node": item["node"],
                 "label": item["label"],
+                "color": "green",
                 "weight": 1
             })
 
         node = {
             "id": len(self.nodes_arr) + 1,
             "name": name,
-            "desc": desc,
+            "label": label,
+            "labelColor": label_color,
             "position": self.setPostion(pos),
             "degree": degrees
         }
@@ -89,7 +97,7 @@ class netGraph:
                 # 计算layer层节点数
                 layer_node = self.compute_layer_nodes(layer)
                 # 计算layer差额 偏量
-                bias = (np.abs(layer_1_node - layer_node) / 2) * self.step
+                bias = np.abs(layer_1_node - layer_node) / 2 * self.step
                 # print(f"bias={bias}")
                 # 遍历nodes 调整layer层各节点的坐标
                 for key in self.pos:
@@ -100,6 +108,9 @@ class netGraph:
                         adj_y = self.pos[key][1] + bias
                         # 更新坐标值
                         self.pos[key] = (x, adj_y)
+                        # 增加node节点的处的标签
+                        self.addNodeLabel(key)
+
 
         if self.AlgorithmType == 'line':
             adjust_line()
@@ -150,6 +161,9 @@ class netGraph:
                     else:
                         self.addEdge((node["name"], edge["node"]))
 
+                    # 添加edge标签：两点坐标中点公式
+                    self.addEdgeLabel(self.pos[edge["node"]], self.pos[node["name"]], edge["label"], edge["color"])
+
     def netGraphToNetworkX(self):
         last_node = self.nodes_arr[-1]
         self.G.add_node(last_node["name"])
@@ -160,20 +174,89 @@ class netGraph:
                 self.G.add_edge(last_node["name"], node["node"], weight=node["weight"])
 
     def draw(self):
+        """
+        desc:
+                self.ax  matplotlib對象
+        """
+        # 绘制图
+        fig, self.ax = plt.subplots(1, 1, figsize=(10, 10))
+
         # 算法调整
         self.adjust_layer_nodes_position()
         # 增加边
         self.addEdgeFromNodesArr()
-        # 绘制图
-        plt.figure(figsize=(10, 10))
+
+        # 绘制
         nx.draw(self.G,
                 pos=self.pos,
+                ax=self.ax,
                 with_labels=True,
                 node_color='white',
-                edgecolors='black',
+                edgecolors='blue',
                 linewidths=1,
                 width=2,
                 node_size=self.node_size)
+
         plt.xlim((0, 5))
-        plt.ylim((0, 15))
+        plt.ylim((0, 10))
         plt.show()
+
+    def addEdgeLabel(self, node1=(), node2=(), label="", color="red"):
+        """
+        desc: edge标签设置
+        paremeters:
+            node1   tuple  度其中节点1的坐标
+            node2   tuple  度其中节点2的坐标
+            label   str    度标签描述
+        """
+        print(f"node1 = {node1}  node2={node2}  label={label}")
+
+        # 偏量
+        bias = 0.08
+        # 中点坐标
+        mid_x, mid_y = (node1[0] + node2[0]) / 2, (node1[1] + node2[1]) / 2
+
+        # 绘制
+        self.ax.text(mid_x + bias, mid_y - bias, label, color=color)
+
+
+
+    def findNodeByPosKeyInNodesArr(self, node_name):
+        """
+        desc: 根据node名称查找节点对象 在nodes_arr中
+        paremeters:
+            node_name   str / int  node的名称name
+        """
+        # 获取节点信息
+        node = {}
+        for item in self.nodes_arr:
+            if item["name"] == node_name:
+                # 获取目标node
+                node = item
+        return  node
+
+
+    def addNodeLabel(self, pos_key=""):
+        """
+        desc: node节点标签设置
+        paremeters:
+            pos_key  str self.pos dict对应的键key
+        """
+
+        # 获取node的坐标 tuple元组
+        pos_x_y = self.pos[pos_key]
+
+        x_bias = -self.node_size/1000 * 0.5
+        y_bias = 0
+
+        # 坐标偏移量
+        pos_x_y_bias = (pos_x_y[0] + x_bias, pos_x_y[1] +y_bias)
+
+        # 获取目标节点对象
+        node = self.findNodeByPosKeyInNodesArr(pos_key)
+        if node:
+            # 绘制
+            self.ax.text(*pos_x_y_bias, node["label"], color=node["labelColor"])
+        else:
+            # 绘制
+            self.ax.text(*pos_x_y_bias, "this node is removed", color=node["labelColor"])
