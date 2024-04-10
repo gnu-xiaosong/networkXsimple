@@ -25,8 +25,11 @@ class netGraph:
         paremeters:
             pos   (层数，节点序号)
             previous,nexts   [{
-               "node": ,
-               "label":
+                 "type": 1,  # 出度
+                "node": item["node"],
+                "label":  item["label"]   if item.has_key("label")   else "",
+                "color":  item["color"]   if item.has_key("color")   else "black",
+                "weight": item["weight"]  if item.has_key("weight") else 1
             }]
             label="", label_color ="black"
 
@@ -36,18 +39,18 @@ class netGraph:
             degrees.append({
                 "type": 0,  # 入度
                 "node": item["node"],
-                "label": item["label"],
-                "color": "green",
-                "weight": 1
+                "label": item["label"]   if item.has_key("label") else "",
+                "color": item["color"]   if item.has_key("color") else "black",
+                "weight": item["weight"] if item.has_key("weight") else 1
             })
 
         for item in nexts:
             degrees.append({
                 "type": 1,  # 出度
                 "node": item["node"],
-                "label": item["label"],
-                "color": "green",
-                "weight": 1
+                "label":  item["label"]   if item.has_key("label")   else "",
+                "color":  item["color"]   if item.has_key("color")   else "black",
+                "weight": item["weight"]  if item.has_key("weight") else 1
             })
 
         node = {
@@ -59,9 +62,13 @@ class netGraph:
             "degree": degrees
         }
 
+        # 判断是否重复设置了相同的node
+        if name  in self.pos:
+            print(f"node={name} alread exist!")
+            return None
+
         self.pos[name] = self.setPostion(pos)
         self.nodes_arr.append(node)
-
         # 增加层数： 判断是否存在layer数组中
         if pos[0] not in self.layers:
             self.layers.append(pos[0])

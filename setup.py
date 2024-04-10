@@ -18,7 +18,7 @@ URL = 'https://github.com/gnu-xiaosong/networkXsimple.git'
 EMAIL = '1829134124@qq.com'
 AUTHOR = 'xskj'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.1.3'
+VERSION = '0.1.6'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
