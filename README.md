@@ -45,19 +45,18 @@ from package_xskj_NetworkXsimple import netGraph
 
 from net import netGraph
 
-
 # 示例用法
 graph = netGraph(type=1)
 
 # 添加节点
 graph.addNode(
     name="A",
-    pos=(1, 1) ,
+    pos=(1, 1),
     nexts=[
-    {
-        "node": "G",
-        "label":"edge label"
-    }],
+        {
+            "node": "G",
+            "label": "edge label"
+        }],
     previous=[
         {
             "node": "G",
@@ -67,9 +66,8 @@ graph.addNode(
     label="AAAAA",
     label_color="pink")
 
-
-graph.addNode(name="B", label="BBBBB",  pos=(1, 2))
-graph.addNode(name="C", label="BBBBB",  pos=(1, 3))
+graph.addNode(name="B", label="BBBBB", pos=(1, 2))
+graph.addNode(name="C", label="BBBBB", pos=(1, 3))
 graph.addNode(name="D", label="节点A", pos=(1, 4))
 graph.addNode(name="E", label="节点A", pos=(1, 5))
 graph.addNode(name="F", label="节点A", pos=(1, 6))
@@ -88,6 +86,6 @@ graph.addEdge(("B", "G"))
 graph.draw()
 ```
 ### show
-![img_2.png](img_2.png)
+![img_1.png](img_1.png)
 
 ## update log
