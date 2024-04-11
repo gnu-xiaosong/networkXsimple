@@ -2,30 +2,70 @@
 
 This is a simple encapsulation for networkX, which further simplifies the process of networkX for drawing neural network diagrams, so that the author can only focus on the logical writing of neural networks, without spending time on the visual presentation of neural networks. At the same time, this module also inherits all the methods of network and does not affect the normal function calls of networkX.
 
+* 简化版的networkX绘制简单且容易上手的神经网络绘图库,
+* 基于networkX开发
 # install
 `
 pip install NetworkXsimple
 `
 # guid
 
-### api
+### guide
 ```python
-graph.addNode(
-    name="node name",
-    pos=(int layer, int node No)  ,
+
+from package_xskj_NetworkXsimple import netGraph
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+# 设置正常显示符号
+plt.rcParams["axes.unicode_minus"] = False
+sns.set_theme()
+plt.rcParams['font.sans-serif']=['SimHei']   # 用黑体显示中文
+
+
+# 实例化netGraph对象
+networkGraph =netGraph(type=1)
+
+# 增加网络节点
+networkGraph.addNode(
+    name="节点名称标识",
+    pos=(所在网络层layer, 该网络层中1开始从下往上的节点索引),
+    label= "该节点node的描述label",
+    label_color="label的颜色，默认black",
+    # 出度edge边信息
     nexts=[
-    {
-        "node": "G",
-        "label":"edge label"
-    }],
-    previous=[
         {
-            "node": "G",
-            "label": "edge label G"
-        }
+            "node": "连接node的name",
+            "label": "edge边标签",
+            "color": "edge边标签颜色",
+            "weight": edge边的权重
+        },
     ],
-    label="AAAAA",
-    label_color="pink")
+    previous=[
+         {
+            "node": "连接node的name",
+            "label": "edge边标签",
+            "color": "edge边标签颜色",
+            "weight": edge边的权重
+        },
+    ]
+)
+
+# 增加edge边
+edge = {
+    "node":  name,        # 入度连接节点的node     str     对应于节点在网络中唯一标识符 name
+    "label":  label,      # 入度edge的标签        str     作为edge信息展示   默认为None
+    "color":  color,      # 标签label和edge的颜色  str     默认为 black
+    "weight": weight      # 入度edge的权重        float    默认为1
+  }
+
+# 绘制网络图
+networkGraph.draw()
+
+# 获取nx.Graph()实例，用于直接访问networkX定义的属性和方法，便于用户更多的操作网络图的自主性
+G = networkGraph.getNetworkXInstance()
+......
 ```
 ![img.png](img.png)
 * nexts : output degress   dict
@@ -89,3 +129,5 @@ graph.draw()
 ![img_1.png](img_1.png)
 
 ## update log
+
+* 2024.4.12  增加直接操作networkX的方法实例，且完善了api文档使用 , 对应版本v0.2.1

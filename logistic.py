@@ -13,7 +13,7 @@ import plotly.express as px
 from IPython.display import HTML # 导入HTML
 import plotly.graph_objects as go
 import plotly.io as pio
-from net import netGraph
+from package_xskj_NetworkXsimple import netGraph
 
 
 pio.renderers.default = "iframe"

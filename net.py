@@ -3,39 +3,122 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.font_manager import FontProperties
 
+
 # 设置matplotlib正常显示中文和负号
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 用黑体显示中文
 plt.rcParams['axes.unicode_minus'] = False  # 正常显示负号
 
 
 class netGraph:
-    def __init__(self, type=0):
-        if type == 0:
-            self.G = nx.Graph()  # 无向图
-        else:
-            self.G = nx.DiGraph()  # 有向图
+    """
+    desc: 简化版的networkX绘制简单且容易上手的神经网络绘图库
+    guide:
+        from package_xskj_NetworkXsimple import netGraph
+        import numpy as np
+        import matplotlib.pyplot as plt
 
-        self.nodes_arr = []  # 节点数组
-        self.pos = {}  # 节点位置信息字典
-        self.layers = []  # 层数
-        self.step = 1  # 同层节点间的步长间隔
-        self.AlgorithmType = "line"  # 调整算法类型
-        self.node_size = 1000
 
-    def addNode(self, name="", pos=(1, 1), previous=[], nexts=[] ,label="label", label_color ="black" , **kwargs):
+        # 设置正常显示符号
+        plt.rcParams["axes.unicode_minus"] = False
+        sns.set_theme()
+        plt.rcParams['font.sans-serif']=['SimHei']   # 用黑体显示中文
+
+
+        # 实例化netGraph对象
+        networkGraph =netGraph(type=1)
+
+        # 增加网络节点
+        networkGraph.addNode(
+            name="节点名称标识",
+            pos=(所在网络层layer, 该网络层中1开始从下往上的节点索引),
+            label= "该节点node的描述label",
+            label_color="label的颜色，默认black",
+            # 出度edge边信息
+            nexts=[
+                {
+                    "node": "连接node的name",
+                    "label": "edge边标签",
+                    "color": "edge边标签颜色",
+                    "weight": edge边的权重
+                },
+            ],
+            previous=[
+                 {
+                    "node": "连接node的name",
+                    "label": "edge边标签",
+                    "color": "edge边标签颜色",
+                    "weight": edge边的权重
+                },
+            ]
+        )
+
+        # 增加edge边
+        edge = {
+            "node":  name,        # 入度连接节点的node     str     对应于节点在网络中唯一标识符 name
+            "label":  label,      # 入度edge的标签        str     作为edge信息展示   默认为None
+            "color":  color,      # 标签label和edge的颜色  str     默认为 black
+            "weight": weight      # 入度edge的权重        float    默认为1
+          }
+
+        # 绘制网络图
+        networkGraph.draw()
+
+        # 获取nx.Graph()实例，用于直接访问networkX定义的属性和方法，便于用户更多的操作网络图的自主性
+        G = networkGraph.getNetworkXInstance()
+        。。。。。
+    """
+
+
+
+
+    def __init__(self, type=0, step= 1, AlgorithmType="line", node_size=1000, **keyarg):
         """
-        desc：增加节点
-        paremeters:
-            pos   (层数，节点序号)
-            previous,nexts   [{
-                 "type": 1,  # 出度
-                "node": item["node"],
-                "label":  item["label"]   if item.has_key("label")   else "",
-                "color":  item["color"]   if item.has_key("color")   else "black",
-                "weight": item["weight"]  if item.has_key("weight") else 1
-            }]
-            label="", label_color ="black"
+        desc: 初始化netGraph
+        parameters:
+            type:  图类型  int
+                   0    无向图
+                   1    有向图
+            step: 同层节点间的步长间隔 float
+                  默认为1
+            AlgorithmType:  节点坐标不惧算法类型 str
+                            默认 line型
+            node_size:      节点大小  int
+                            默认1000
+            keyarg
+        """
+        if type == 0:
+            self.G = nx.Graph()                # 无向图
+        else:
+            self.G = nx.DiGraph()              # 有向图
 
+        self.nodes_arr = []                    # 节点数组
+        self.pos = {}                          # 节点位置信息字典
+        self.layers = []                       # 层数
+        self.step = step                       # 同层节点间的步长间隔
+        self.AlgorithmType = AlgorithmType     # 调整算法类型
+        self.node_size = node_size
+
+    def addNode(self, name="", pos=(1, 1), previous=[], nexts=[] ,label="", label_color="black" , **kwargs):
+        """
+        desc：        增加网络节点node
+        paremeters:
+            name:   节点名称              str    作为节点的在网络中的唯一标识，所以要保证唯一性，同时也作为节点的显示名称
+            label:  节点描述标签           str    位于节点附近的文字展示
+            label_color: 节点描述标签的颜色 str    默认为black黑色
+            pos：   节点在网络中的位置,网络位置采用层数+节点序号命名  tuple
+                    pos=(n,  j)
+                    n:  node所在层数layer,从左到右, 从1索引开始
+                    j:  该层所在的序号, 从下往上,   从1索引开始
+            previous: 入度的edge   list  数组中每一个item元素都作为一条入度edge信息
+                      >>previous=[
+                          {
+                            "node":  name,        # 入度连接节点的node     str     对应于节点在网络中唯一标识符 name
+                            "label":  label,      # 入度edge的标签        str     作为edge信息展示   默认为None
+                            "color":  color,      # 标签label和edge的颜色  str     默认为 black
+                            "weight": weight      # 入度edge的权重        float    默认为1
+                          }
+                      ]
+            nexts: 出度edge信息，参数意义同上
         """
         degrees = []
         for item in previous:
@@ -84,10 +167,19 @@ class netGraph:
         """
         desc: 增加边
         paremeters:
-          e (a,b)  tuple
-          edge dict 度的信息
+              e (a,b)  tuple
+              edge dict 度的信息
         """
         self.G.add_edge(*e, weight = float(edge["weight"]), color=edge["color"])
+
+
+    def getNetworkXInstance(self):
+        """
+        desc: 获取networkX的实例化对象，也方便用户直接使用networkX的属性和方法操作网络图 指向 nx.Graph() or nx.DiGraph()
+        return G对象
+        """
+
+        return  self.G
 
 
     def adjust_layer_nodes_position(self):
@@ -192,7 +284,7 @@ class netGraph:
 
     def draw(self):
         """
-        desc:
+        desc:   绘制网络图
                 self.ax  matplotlib對象
         """
         # 绘制图
@@ -268,7 +360,6 @@ class netGraph:
                                fc=(1.0, 1.0, 1.0),
                                ),
                      color=color)
-
 
 
     def findNodeByPosKeyInNodesArr(self, node_name):
